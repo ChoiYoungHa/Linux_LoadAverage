@@ -1,7 +1,7 @@
 # ⛳ Linux의 평균 부하(Load Average)에 대해 이해하기
 ## 🎨 개요
-> 리눅스 시스템에서의 서버 성능관리와 CPU 과부하 상황에서의 문제해결력을 키우기 위해 실습을 진행합니다. <br>
-평균부하와 CPU사용률에 대한 차이를 이해하고 모니터링하는 방법과 부하 테스트 방법을 익히는 것을 목표로 합니다.
+> 리눅스 시스템에서의 **서버 성능 관리와 CPU 과부하 상황**에서의 문제 해결력을 키우기 위해 실습을 진행합니다. <br>
+**평균 부하와 CPU 사용률**에 대한 차이를 이해하고 모니터링하는 방법과 부하 테스트 방법을 익히는 것을 목표로 합니다.
 <br>
 <h2 style="font-size: 25px;"> 👨‍👨‍👧‍👦💻 팀원 <br>
 <br>
@@ -11,6 +11,7 @@
 |[@최영하](https://github.com/ChoiYoungha)|[@허예은](https://github.com/yyyeun)
 
 <br></h2>
+<br>
 
 시스템이 느릴 때, `top`이나 `uptime` 명령어로 시스템의 부하를 확인할 수 있다.
 
@@ -89,27 +90,35 @@ $ uptime
 
 ## 평균 부하에 대한 다양한 시나리오
 ### 🚩  시나리오 1. CPU 집중적인 프로세스
-- CPU 집중적인 작업이 시스템의 평균 부하에 미치는 영향을 나타내는 시나리오
-- `stress` 명령어로 CPU에 인위적인 부하를 발생
+> 개요: CPU 집중적인 작업이 시스템의 평균 부하에 미치는 영향을 나타내는 시나리오
+
+1. `stress` 명령어로 CPU에 인위적인 부하를 발생
 
 ![image](https://github.com/user-attachments/assets/70f69d2e-a228-475a-a0bf-e8efa4b65b01)
-
 - **-cpu 2**: 두 개의 CPU 코어에 부하를 발생시킴
 - **-timeout 300**: 300초(5분) 동안 부하를 유지함
 
+2. 2개의 CPU에게 stress 테스트
+
 ![image](https://github.com/user-attachments/assets/87fa06f5-88a5-4c5c-be3d-4ae39712e33c)
-- 2개의 cpu에게 스트레스 테스트를 진행함
-    - 사용률이 100% 가까이 나오는 것을 확인함
+- 사용률이 100% 가까이 나오는 것을 확인함
 
 ![image](https://github.com/user-attachments/assets/055aa5eb-880e-4b83-97c4-3be3cb23524d)
-- 1분정도 부하를 주었고 uptime 명령어로 1분,5분,15분 단위로 부하가 표시됨
-    - 2코어이므로 2에 가까울수록 cpu 평균부하가 100%에 가까운 것을 확인할 수 있음
+- 1분의 부하를 주었고 `uptime` 명령어로 1분, 5분, 15분 단위로 부하가 표시됨
+
+**결과**: 2 core이므로 2에 가까울수록 CPU 평균부하가 100%에 가까운 것을 확인할 수 있음
 
 <br>
 
 ### 🚩  시나리오 2. CPU I/O stress 테스트
+> 개요: 디스크 I/O가 과하게 발생해도 CPU의 평균 사용률을 높일 수 있음을 확인하는 시나리오
+
+1. I/O에 부하를 줌
+
 ![image](https://github.com/user-attachments/assets/c7fde94c-f521-4bef-980b-2a1cc633469d)
-- stress 명령어를 실행하지만 sync 명령도 계속 실행해서 I/O에 부하를 줌
+- `stress` 명령어를 실행하지만 sync 명령도 계속 실행해서 I/O에 부하를 줌
+
+2. I/O stress 테스트
 
 ![image](https://github.com/user-attachments/assets/1844cd1c-54a7-4a7e-bf98-800ace6a5288)
 ![image](https://github.com/user-attachments/assets/827944bb-9387-4b75-b8de-3644b4aad03c)
@@ -118,23 +127,25 @@ $ uptime
 - 이는 평균 부하의 증가가 iowait 상승이 원인임을 알 수 있음
 
 ![image](https://github.com/user-attachments/assets/2db51eee-1d2d-45d6-93f3-91568b83ed13)
-- 어떤 프로세스가 높은 iowait을 가지고 오는지 확인할 수 있음
-- stress 프로세스가 높은 `%wait`를 발생 시키는 것을 확인할 수 있음
+
+**결과**: 어떤 프로세스가 높은 iowait을 가지고 오는지, 그리고 stress 프로세스가 높은 `%wait`를 발생시키는 것을 확인할 수 있음
 <br>
 
 ### 🚩  시나리오 3. 시스템의 Core 수보다 더 많은 프로세스가 실행되는 경우
-- 시스템에서 실행 중인 프로세스 수가 CPU의 처리 용량을 초과하면, CPU를 기다리는 프로세스가 발생한다. 
-- 여전히 stress를 사용하지만 이번에는 8개의 프로세스를 시뮬레이션 실행
+> 개요: 프로세스 수가 CPU의 처리 용량을 초과한 경우의 시나리오
 
+1. 시스템에서 실행 중인 프로세스 수가 CPU의 처리 용량을 초과하면, CPU를 기다리는 프로세스가 발생한다. 여전히 stress를 사용하지만 이번에는 8개의 프로세스를 시뮬레이션 실행
 ![image](https://github.com/user-attachments/assets/2a4dc61d-57fc-48be-baf9-30544e69eea0)
 
 시스템에는 2개의 CPU만 있기 때문에, 8개의 프로세스는 CPU 수보다 훨씬 많아 CPU가 심하게 과부하되며 평균 부하가 6.13에 도달
+
+2. 프로세스의 부하 상태를 재확인
 ![image](https://github.com/user-attachments/assets/0e666d5e-6d4f-45b0-a1b6-463b3b5eb061)
 - 여기서 8개의 프로세스가 2개의 CPU를 두고 경쟁 중임을 확인할 수 있다.
 - 각 프로세스는 CPU를 기다리는 시간이 최대 77%에 달한다.(%wait 열로 표시됨)
 - 이처럼 CPU의 계산 용량을 초과하는 프로세스들은 결국 CPU 과부하를 초래하게 된다.
 
-이는 프로세스 수가 CPU 처리 능력을 초과할 때 시스템에 미치는 영향을 설명하며, CPU 대기 시간이 길어지는 것을 확인할 수 있다.
+**결과**: 이는 프로세스 수가 CPU 처리 능력을 초과할 때 시스템에 미치는 영향을 설명하며, CPU 대기 시간이 길어지는 것을 확인할 수 있다.
 
 <br>
 
