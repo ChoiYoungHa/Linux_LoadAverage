@@ -1,5 +1,15 @@
 # ⛳ Linux의 평균 부하(Load Average)에 대해 이해하기
 
+
+<h2 style="font-size: 25px;"> 👨‍👨‍👧‍👦💻 팀원 <br>
+<br>
+    
+|<img src="https://avatars.githubusercontent.com/u/64997345?v=4" width="120" height="120"/>|<img src="https://avatars.githubusercontent.com/u/38968449?v=4" width="120" height="120"/>
+|:-:|:-:|
+|[@최영하](https://github.com/ChoiYoungha)|[@허예은](https://github.com/yyyeun)
+
+<br></h2>
+
 시스템이 느릴 때, `top`이나 `uptime` 명령어로 시스템의 부하를 확인할 수 있다.
 
 ```bash
@@ -71,6 +81,47 @@ $ uptime
 - **1분 평균 부하**가 CPU 수에 근접하거나 이를 초과할 때, 시스템이 과부하 상태에 있음을 의미하며, **이 시점에서 문제의 원인을 분석하고 최적화할 필요**가 있음
 
 만약 1.73, 0.60, 7.98이라는 평균 부하를 가진 단일 CPU 시스템을 본다면, 이는 지난 1분 동안 시스템이 73% 과부하 상태에 있었고, 지난 15분 동안에는 698% 과부하 상태에 있었다는 것을 나타낸다. 하지만 전체적인 추세는 시스템 부하가 감소하고 있음을 보여준다.
+
+<br>
+
+## 평균 부하에 대한 다양한 시나리오
+### 🚩  시나리오 1. CPU 집중적인 프로세스
+- CPU 집중적인 작업이 시스템의 평균 부하에 미치는 영향을 나타내는 시나리오
+- `stress` 명령어로 CPU에 인위적인 부하를 발생
+
+![image](https://github.com/user-attachments/assets/70f69d2e-a228-475a-a0bf-e8efa4b65b01)
+
+- **-cpu 2**: 두 개의 CPU 코어에 부하를 발생시킴
+- **-timeout 300**: 300초(5분) 동안 부하를 유지함
+
+![image](https://github.com/user-attachments/assets/87fa06f5-88a5-4c5c-be3d-4ae39712e33c)
+- 2개의 cpu에게 스트레스 테스트를 진행함
+    - 사용률이 100% 가까이 나오는 것을 확인함
+
+![image](https://github.com/user-attachments/assets/055aa5eb-880e-4b83-97c4-3be3cb23524d)
+- 1분정도 부하를 주었고 uptime 명령어로 1분,5분,15분 단위로 부하가 표시됨
+    - 2코어이므로 2에 가까울수록 cpu 평균부하가 100%에 가까운 것을 확인할 수 있음
+
+<br>
+
+### 🚩  시나리오 2. CPU I/O stress 테스트
+![image](https://github.com/user-attachments/assets/c7fde94c-f521-4bef-980b-2a1cc633469d)
+- stress 명령어를 실행하지만 sync 명령도 계속 실행해서 I/O에 부하를 줌
+
+![image](https://github.com/user-attachments/assets/1844cd1c-54a7-4a7e-bf98-800ace6a5288)
+![image](https://github.com/user-attachments/assets/827944bb-9387-4b75-b8de-3644b4aad03c)
+- 1분 동안 평균 부하가 천천히 1.15으로 증가하는 것을 볼 수 있음
+- 한 CPU의 시스템 CPU 사용률은 16.67%로 상승하고, iowait는 58.13% 에 도달
+- 이는 평균 부하의 증가가 iowait 상승이 원인임을 알 수 있음
+
+![image](https://github.com/user-attachments/assets/2db51eee-1d2d-45d6-93f3-91568b83ed13)
+- 어떤 프로세스가 높은 iowait을 가지고 오는지 확인할 수 있음
+- stress 프로세스가 높은 `%wait`를 발생 시키는 것을 확인할 수 있음
+<br>
+
+### 🚩  시나리오 3. 시스템의 Core 수보다 더 많은 프로세스가 실행되는 경우
+- CPU 집중적인 작업이 시스템의 평균 부하에 미치는 영향을 나타내는 시나리오
+
 
 <br>
 
